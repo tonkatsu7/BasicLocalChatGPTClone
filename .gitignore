@@ -1,0 +1,19 @@
+# Python virtual environment
+venv/
+
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Gradio generated files
+gradio/__pycache__/
+gradio/interface/__pycache__/
+gradio/interface/static/
+gradio/interface/templates/
+
+# IDE files
+.vscode/
+.idea/
+
+# Miscellaneous
+.DS_Store
