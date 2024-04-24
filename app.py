@@ -8,11 +8,17 @@ headers = {
     'Content-Type': 'application/json'
 }
 
+conversation_history = []
+
 def generate_response(prompt):
+    conversation_history.append(prompt)
+
+    full_prompt = "\n".join(conversation_history)
+
     data = {
         "model": "llama2",
         "stream": False,
-        "prompt": prompt
+        "prompt": full_prompt
     }
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
@@ -22,6 +28,7 @@ def generate_response(prompt):
         data = json.loads(response_text)
         actual_response = data["response"]
         print(actual_response)
+        conversation_history.append(actual_response)
         return actual_response
     else:
         print("Error: ", response.status_code, response.text)
