@@ -11,7 +11,7 @@ headers = {
 conversation_history = []
 
 def generate_response(prompt):
-    conversation_history.append(prompt)
+    conversation_history.append("You: " + prompt)
 
     full_prompt = "\n".join(conversation_history)
 
@@ -24,19 +24,21 @@ def generate_response(prompt):
     response = requests.post(url, headers=headers, data=json.dumps(data))
 
     if response.status_code == 200:
-        response_text = response.text
-        data = json.loads(response_text)
+        response_txt = response.text
+        data = json.loads(response_txt)
         actual_response = data["response"]
-        print(actual_response)
-        conversation_history.append(actual_response)
-        return actual_response
+        conversation_history.append("AI: " + actual_response)
+        return "\n".join(conversation_history)
     else:
-        print("Error: ", response.status_code, response.text)
+        error_message = "Error: " + str(response.status_code) + " " + response.text
+        conversation_history.append("AI: " + error_message)
+        return "\n".join(conversation_history)
 
-iface = gr.Interface(fn=generate_response, 
-                     inputs=["text"], 
-                     outputs=["text"]
-                    )
+iface = gr.Interface(
+    fn=generate_response,
+    inputs=["text"],
+    outputs=["text"]
+)
 
 if __name__ == "__main__":
     iface.launch()
