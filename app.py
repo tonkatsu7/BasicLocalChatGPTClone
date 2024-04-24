@@ -8,12 +8,16 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-conversation_history = []
+conversation_history_4_gradle = []
+conversation_history_4_llama = []
 
 def generate_response(prompt):
-    conversation_history.append("You: " + prompt)
+    # Append user message
+    conversation_history_4_gradle.append([prompt, None])  # User message with no bot response yet
+    conversation_history_4_llama.append("prompt: " + prompt)
 
-    full_prompt = "\n".join(conversation_history)
+    full_prompt = "\n".join(conversation_history_4_llama) + "\nresponse: "
+    print(full_prompt)
 
     data = {
         "model": "llama2",
@@ -27,17 +31,20 @@ def generate_response(prompt):
         response_txt = response.text
         data = json.loads(response_txt)
         actual_response = data["response"]
-        conversation_history.append("AI: " + actual_response)
-        return "\n".join(conversation_history)
+        conversation_history_4_gradle[-1][1] = actual_response  # Update the latest pair with the bot's response
+        print(conversation_history_4_gradle)
+        conversation_history_4_llama.append("response: " + actual_response)
     else:
         error_message = "Error: " + str(response.status_code) + " " + response.text
-        conversation_history.append("AI: " + error_message)
-        return "\n".join(conversation_history)
+        conversation_history_4_gradle[-1][1] = error_message  # Update the latest pair with the error message
+
+    return conversation_history_4_gradle
 
 iface = gr.Interface(
     fn=generate_response,
-    inputs=["text"],
-    outputs=["text"]
+    inputs=gr.Textbox(lines=2, placeholder="Type here..."),
+    outputs=gr.Chatbot(),
+    examples=[["Hello"], ["How are you?"]]
 )
 
 if __name__ == "__main__":
